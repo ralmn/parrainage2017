@@ -1,0 +1,27 @@
+<div class="layout-wrapper">
+    <div id="header" [ngClass]="{'active':mobileMenuActive}">
+        <span class="layout-logo">
+            <a href="#" class="sidebar-logo" [routerLink]="['/']">
+                Parrainage 2017
+            </a>
+        </span>
+        
+        <a class="menu_input" *ngFor="let candidat of list" [routerLink]="['/candidat',candidat.slug ]">
+            {{candidat.nom}}
+        </a>
+        
+    </div>
+
+    <div id="layout-content">
+        <div id="topbar">
+        </div>
+
+        <div>
+            <router-outlet></router-outlet>
+        </div>
+
+        <div class="content-section footer clearfix">
+        </div>
+    </div>
+
+</div>

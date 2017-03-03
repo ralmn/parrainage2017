@@ -1,0 +1,20 @@
+<p *ngIf="candidat == null" >Chargement</p>
+<div *ngIf="candidat != null" >
+    <h1>{{candidat.Nom}}</h1>
+    <p id="nbParrains"> {{candidat.Parrains.length}} parrains</p> 
+
+    <h2>Parrains</h2>
+    <p-dataTable [value]="candidat.Parrains" [rows]="10" [paginator]="true"  [rowsPerPageOptions]="[5,10,20,50,100]">
+            <p-column field="Civilité" header="Civilité" [sortable]="true"></p-column>
+            <p-column field="Nom" header="Nom" [sortable]="true"></p-column>
+            <p-column field="Prénom" header="Prenom" [sortable]="true"></p-column>
+            <p-column field="Mandat" header="Mandat" [sortable]="true"></p-column>
+            <p-column field="Circonscription" header="Circonscription / Ville" [sortable]="true"></p-column>
+            <p-column field="Département" header="Département" [sortable]="true"></p-column>
+            <p-column field="Date_de_publication" header="Date publication" [sortable]="true"></p-column>
+    </p-dataTable>
+
+    <p-chart type="doughnut" [data]="mandats"></p-chart>
+    <p-chart type="line" [data]="dates"></p-chart>
+
+</div>

@@ -1,0 +1,40 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+#header{
+    min-height: 2em;
+    width: 100%;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+    flex-wrap: wrap;
+    
+    background-color: #6294f7;
+
+}
+
+#header .layout-logo{
+    font-size: 1.5em;
+    padding: 5px 10px;
+    font-weight: bold;
+
+
+}
+
+#header a{
+    color: white;
+}
+#header a:visited{
+    color: white;
+}
+
+#header .menu_input{
+     white-space: nowrap;
+     padding: 5px 10px;
+   
+
+}
