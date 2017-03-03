@@ -38,3 +38,19 @@
    
 
 }
+
+.charts{
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+     flex-wrap: wrap ;
+}
+
+.charts p-chart{
+    width: 50%;
+}
+.charts p-chart.fullWidth{
+    width: 100%;
+}

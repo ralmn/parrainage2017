@@ -14,7 +14,12 @@
             <p-column field="Date_de_publication" header="Date publication" [sortable]="true"></p-column>
     </p-dataTable>
 
-    <p-chart type="doughnut" [data]="mandats"></p-chart>
-    <p-chart type="line" [data]="dates"></p-chart>
+    <div class="charts">
+        <p-chart type="doughnut" [data]="mandats"></p-chart>
+        <p-chart type="line" [data]="dates"></p-chart>
+        <p-chart type="doughnut" [data]="departement" class="fullWidth"></p-chart>
+    </div>
+
+    
 
 </div>
