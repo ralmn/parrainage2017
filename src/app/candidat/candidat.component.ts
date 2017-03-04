@@ -14,6 +14,7 @@ import { Candidat } from '../domain/candidat';
 export class CandidatComponent implements OnInit {
 
   slug: String;
+  parrainStr = "s";
   candidat: Candidat;
   mandats: any = null;
 
@@ -176,7 +177,11 @@ export class CandidatComponent implements OnInit {
         }
 
 
-
+        if(candidat.Parrains.length < 2){ 
+          this.parrainStr = "";
+        }else{
+          this.parrainStr = "s";
+        }
         this.candidat = candidat;
       }
     });
