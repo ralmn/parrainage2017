@@ -15,9 +15,9 @@
     </p-dataTable>
 
     <div class="charts">
-        <p-chart type="doughnut" [data]="mandats"></p-chart>
-        <p-chart type="line" [data]="dates"></p-chart>
-        <p-chart type="doughnut" [data]="departement" class="fullWidth"></p-chart>
+        <p-chart type="doughnut" [data]="mandats" [options]="mandats.options"></p-chart>
+        <p-chart type="line" [data]="dates" [options]="dates.options"></p-chart>
+        <p-chart type="doughnut" [data]="departement" class="fullWidth" [options]="departement.options"></p-chart>
     </div>
 
     

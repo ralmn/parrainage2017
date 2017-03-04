@@ -17,7 +17,6 @@ export class AppComponent implements OnInit {
       if(err){
 
       }else{
-        console.log(list);
         this.list = list;
       }
     })

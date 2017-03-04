@@ -10,6 +10,6 @@ export class Candidat {
     }
 
     slug() : string {
-        return this.Nom.replace(' ', '').toLowerCase();
+        return this.Nom.replace(' ', '_').toLowerCase();
     }
 }

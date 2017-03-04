@@ -61,7 +61,7 @@ export class CandidatComponent implements OnInit {
 
         for (let mandat of mandats) {
           mandatsCount.push(0);
-          mandatsColor.push('#' + Math.floor(Math.random() * 16777215).toString(16));
+          mandatsColor.push(this.randomColor());
         }
 
 
@@ -79,7 +79,7 @@ export class CandidatComponent implements OnInit {
           } else {
             departements.push(parrain.Département);
             departementCount.push(1);
-            departementColor.push('#' + Math.floor(Math.random() * 16777215).toString(16));
+            departementColor.push(this.randomColor());
           }
 
           let indexData = dates.indexOf(parrain.Date_de_publication);
@@ -107,11 +107,17 @@ export class CandidatComponent implements OnInit {
           }
         }
 
-        for(let i in mandats){
+        for (let i in mandats) {
           mandats[i] += " (" + mandatsCount[i] + ")"
         }
 
         this.mandats = {
+          options: {
+            title: {
+              display: true,
+              text: "Répartitions par mandats"
+            },
+          },
           labels: mandats,
           datasets: [
             {
@@ -120,12 +126,18 @@ export class CandidatComponent implements OnInit {
             }
           ]
         }
-        
-        for(let i in departements){
+
+        for (let i in departements) {
           departements[i] += " (" + departementCount[i] + ")"
         }
 
         this.departement = {
+          options: {
+            title: {
+              display: true,
+              text: "Répartitions par département",
+            }
+          },
           labels: departements,
           datasets: [
             {
@@ -136,10 +148,13 @@ export class CandidatComponent implements OnInit {
         }
 
 
-        
-
-
         this.dates = {
+          options: {
+            title: {
+              display: true,
+              text: "Date de publication des parrainages",
+            },
+          },
           labels: dates,
           datasets: [
             {
@@ -169,6 +184,14 @@ export class CandidatComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  randomColor(){
+    var val = Math.floor(Math.random() * 16777215).toString(16);
+    while(val.length < 6){
+      val = "0" + val;
+    }
+    return "#" + val;
   }
 
 }
