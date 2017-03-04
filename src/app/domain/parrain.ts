@@ -6,5 +6,6 @@ export interface Parrain {
     Mandat;
     Nom;
     Prénom;
+    Liste;
 }
 

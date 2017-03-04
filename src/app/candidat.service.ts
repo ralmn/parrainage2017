@@ -8,14 +8,20 @@ import {Http} from '@angular/http';
 
 @Injectable()
 export class CandidatService {
+  
+  private ville_nuance = {}; 
 
-  constructor( private http:Http ) { }
+  constructor( private http:Http ) {
+      this.http.request('/assets/ville_nuance.json').subscribe( res => {
+        let jsonData = res.json() as any;
+        this.ville_nuance = jsonData;
+      })
+
+   }
 
   getCandidats(cb: (error: Error | any, candidats?: Candidat[]) => any) {
 
    
-    
-
     this.http.request('/data.json').subscribe(response =>{
       
       let realCandidats: Candidat[] = [];
@@ -29,7 +35,20 @@ export class CandidatService {
         for(let rawParrain of candidatRAW["Parrainages"]){
           let parrain = rawParrain as Parrain;
           parrain.Date_de_publication = rawParrain["Date de publication"];
+          
+          if(parrain.Mandat == 'Maire'){
+            if(this.ville_nuance[parrain.Circonscription] != null){
+              parrain.Liste = this.ville_nuance[parrain.Circonscription];
+            }else{
+              //parrain.Liste = 'Non détérminé';
+              parrain.Liste = '';
+            }
+          }else{
+            parrain.Liste = '';
+          }
+  
           parrains.push(parrain);
+
         }
 
         let candidat = new Candidat(candidatRAW["Candidat-e parrainé-e"], parrains);

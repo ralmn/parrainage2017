@@ -4,6 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CandidatService } from '../candidat.service';
 import { Candidat } from '../domain/candidat';
 
+import { ViewChild } from '@angular/core';
+import { UIChart } from "primeng/components/chart/chart";
 
 
 @Component({
@@ -20,6 +22,16 @@ export class CandidatComponent implements OnInit {
 
   dates: any = null;
   departement: any = null;
+  listes: any = null;
+
+  @ViewChild("chartmandats") chartMandats: UIChart;
+  @ViewChild("chartdates") chartDates: UIChart;
+  @ViewChild("chartdepartements") chartDepartements: UIChart;
+  @ViewChild("chartlistes") chartListes: UIChart;
+
+
+
+  MANDATS = ["Conseiller/ère départemental-e", "Maire", "Maire délégué-e", "Député-e", "Conseiller/ère métropolitain-e de Lyon", "Maire d'arrondissement", "Sénateur/trice", "Conseiller/ère régional-e", "Président-e d'un conseil de communauté de communes", "Membre du Conseil de Paris", "Représentant-e français-e au Parlement européen", "Président-e d'un conseil de métropole", "Membre de l'assemblée de Corse", "Membre élu-e de l'assemblée des Français de l'étranger"];
 
 
 
@@ -27,6 +39,85 @@ export class CandidatComponent implements OnInit {
     private router: Router,
     private service: CandidatService
   ) {
+  
+
+ 
+
+    this.mandats = {
+      options: {
+        title: {
+          display: true,
+          text: "Répartitions par mandats"
+        },
+      },
+      labels: this.MANDATS,
+      datasets: [
+        {
+          data: [],
+          backgroundColor: []
+        }
+      ]
+    }
+
+    this.departement = {
+      options: {
+        title: {
+          display: true,
+          text: "Répartitions par département",
+        }
+      },
+      labels: [],
+      datasets: [
+        {
+          data: [],
+          backgroundColor: []
+        }
+      ]
+    }
+
+
+    this.dates = {
+      options: {
+        title: {
+          display: true,
+          text: "Date de publication des parrainages",
+        },
+      },
+      labels: [],
+      datasets: [
+        {
+          type: 'line',
+          data: [],
+          label: "Publication ce jour",
+          fill: false,
+          borderColor: '#4bc0c0'
+
+        },
+        {
+          type: 'line',
+          data: [],
+          label: "Progression",
+          fill: false,
+          borderColor: '#565656'
+        }
+      ]
+    }
+
+    this.listes = {
+      options: {
+        title: {
+          display: true,
+          text: "Répartitions par liste electorales des maires (municipale de 2014)",
+        }
+      },
+      labels: [],
+      datasets: [
+        {
+          data: [],
+          backgroundColor: []
+        }
+      ]
+    }
 
     route.params.subscribe(p => {
       this.slug = p["candidat"];
@@ -49,8 +140,7 @@ export class CandidatComponent implements OnInit {
         let dateCount = [];
 
 
-        let mandats = ["Conseiller/ère départemental-e", "Maire", "Maire délégué-e", "Député-e", "Conseiller/ère métropolitain-e de Lyon", "Maire d'arrondissement", "Sénateur/trice", "Conseiller/ère régional-e", "Président-e d'un conseil de communauté de communes", "Membre du Conseil de Paris", "Représentant-e français-e au Parlement européen", "Président-e d'un conseil de métropole", "Membre de l'assemblée de Corse", "Membre élu-e de l'assemblée des Français de l'étranger"];
-
+        
 
         let mandatsCount = [];
         let mandatsColor = [];
@@ -60,7 +150,11 @@ export class CandidatComponent implements OnInit {
         let departementColor = [];
 
 
-        for (let mandat of mandats) {
+        let listes = [];
+        let listesCount = [];
+        let listesColor = [];
+
+        for (let mandat of this.MANDATS) {
           mandatsCount.push(0);
           mandatsColor.push(this.randomColor());
         }
@@ -69,7 +163,7 @@ export class CandidatComponent implements OnInit {
 
 
         for (let parrain of candidat.Parrains) {
-          let indexMandat = mandats.indexOf(parrain.Mandat);
+          let indexMandat = this.MANDATS.indexOf(parrain.Mandat);
           if (indexMandat > - 1) {
             mandatsCount[indexMandat]++;
           }
@@ -90,6 +184,17 @@ export class CandidatComponent implements OnInit {
             dates.push(parrain.Date_de_publication);
             dateCount.push(1);
           }
+
+          if (parrain.Liste != '') {
+            if (listes.indexOf(parrain.Liste) > -1) {
+              listesCount[listes.indexOf(parrain.Liste)]++;
+            } else {
+              listes.push(parrain.Liste);
+              listesCount.push(1);
+              listesColor.push(this.randomColor());
+            }
+          }
+
         }
 
         let datesPogress = [];
@@ -107,79 +212,49 @@ export class CandidatComponent implements OnInit {
             }
           }
         }
-
-        for (let i in mandats) {
-          mandats[i] += " (" + mandatsCount[i] + ")"
+    
+        for (let i in this.MANDATS) {
+          this.mandats[i] += " (" + mandatsCount[i] + ")"
         }
 
-        this.mandats = {
-          options: {
-            title: {
-              display: true,
-              text: "Répartitions par mandats"
-            },
-          },
-          labels: mandats,
-          datasets: [
-            {
-              data: mandatsCount,
-              backgroundColor: mandatsColor
-            }
-          ]
-        }
+
 
         for (let i in departements) {
           departements[i] += " (" + departementCount[i] + ")"
         }
 
-        this.departement = {
-          options: {
-            title: {
-              display: true,
-              text: "Répartitions par département",
-            }
-          },
-          labels: departements,
-          datasets: [
-            {
-              data: departementCount,
-              backgroundColor: departementColor
-            }
-          ]
+        this.mandats.datasets[0].data = mandatsCount;
+        this.mandats.datasets[0].backgroundColor = mandatsColor;
+  
+        this.departement.labels = departements;
+        this.departement.datasets[0].data = departementCount;
+        this.departement.datasets[0].backgroundColor = departementColor;
+
+
+        this.dates.label = dates;
+        this.dates.datasets[0].data = dateCount;
+        this.dates.datasets[1].data = datesPogressCount;
+
+        this.listes.labels = listes;
+        this.listes.datasets[0].data = listesCount;
+        this.listes.datasets[0].backgroundColor = listesColor;
+    
+        if (this.chartMandats != null) {
+          this.chartMandats.refresh();
+        }
+        if (this.chartDates != null) {
+          this.chartDates.refresh();
+        }
+        if (this.chartDepartements != null) {
+          this.chartDepartements.refresh();
+        }
+        if (this.chartListes != null) {
+          this.chartListes.refresh();
         }
 
-
-        this.dates = {
-          options: {
-            title: {
-              display: true,
-              text: "Date de publication des parrainages",
-            },
-          },
-          labels: dates,
-          datasets: [
-            {
-              type: 'line',
-              data: dateCount,
-              label: "Publication ce jour",
-              fill: false,
-              borderColor: '#4bc0c0'
-
-            },
-            {
-              type: 'line',
-              data: datesPogressCount,
-              label: "Progression",
-              fill: false,
-              borderColor: '#565656'
-            }
-          ]
-        }
-
-
-        if(candidat.Parrains.length < 2){ 
+        if (candidat.Parrains.length < 2) {
           this.parrainStr = "";
-        }else{
+        } else {
           this.parrainStr = "s";
         }
         this.candidat = candidat;
@@ -191,9 +266,9 @@ export class CandidatComponent implements OnInit {
   ngOnInit() {
   }
 
-  randomColor(){
+  randomColor() {
     var val = Math.floor(Math.random() * 16777215).toString(16);
-    while(val.length < 6){
+    while (val.length < 6) {
       val = "0" + val;
     }
     return "#" + val;

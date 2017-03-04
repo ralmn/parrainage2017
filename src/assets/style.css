@@ -71,3 +71,14 @@
 .charts p-chart.fullWidth{
     width: 100%;
 }
+
+.codeNuance ul{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}   
+
+.codeNuance li{
+    margin-left: 30px;
+    list-style: none;
+}
