@@ -22,7 +22,7 @@ export class CandidatService {
   getCandidats(cb: (error: Error | any, candidats?: Candidat[]) => any) {
 
    
-    this.http.request('/data.json').subscribe(response =>{
+    this.http.request('/assets/data.json').subscribe(response =>{
       
       let realCandidats: Candidat[] = [];
 
