@@ -14,12 +14,13 @@ import { MessagesModule } from 'primeng/primeng';
 import { InputTextModule } from 'primeng/primeng';
 import { PasswordModule } from 'primeng/primeng';
 import { ButtonModule } from 'primeng/primeng';
-import { DataTableModule, SharedModule } from 'primeng/primeng';
+import { DataTableModule, SharedModule, MultiSelectModule } from 'primeng/primeng';
 import { DialogModule } from 'primeng/primeng';
-import {ChartModule} from 'primeng/primeng';
+import { ChartModule } from 'primeng/primeng';
 
 
 import { CandidatService } from './candidat.service';
+import { SenateurService } from './senateur.service';
 import { HomePageComponent } from './home-page/home-page.component';
 import { CandidatComponent } from './candidat/candidat.component';
 
@@ -42,9 +43,10 @@ import { CandidatComponent } from './candidat/candidat.component';
     SharedModule,
     DialogModule,
     AppRoutingModule,
-    ChartModule
+    ChartModule,
+    MultiSelectModule
   ],
-  providers: [CandidatService],
+  providers: [CandidatService, SenateurService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -4,6 +4,8 @@ import { Parrain } from './domain/parrain';
 
 import {Http} from '@angular/http';
 
+import { SenateurService } from './senateur.service';
+
 
 
 @Injectable()
@@ -11,12 +13,12 @@ export class CandidatService {
   
   private ville_nuance = {}; 
 
-  constructor( private http:Http ) {
+  constructor( private http:Http, private senateurService:SenateurService ) {
       this.http.request('/assets/ville_nuance.json').subscribe( res => {
         let jsonData = res.json() as any;
         this.ville_nuance = jsonData;
-      })
-
+      });
+      
    }
 
   getCandidats(cb: (error: Error | any, candidats?: Candidat[]) => any) {
@@ -35,7 +37,7 @@ export class CandidatService {
         for(let rawParrain of candidatRAW["Parrainages"]){
           let parrain = rawParrain as Parrain;
           parrain.Date_de_publication = rawParrain["Date de publication"];
-          
+          this.senateurService.getGroupeSenateur(parrain);
           if(parrain.Mandat == 'Maire'){
             if(this.ville_nuance[parrain.Circonscription] != null){
               parrain.Liste = this.ville_nuance[parrain.Circonscription];

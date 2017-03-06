@@ -5,7 +5,7 @@ import { CandidatService } from '../candidat.service';
 import { Candidat } from '../domain/candidat';
 
 import { ViewChild } from '@angular/core';
-import { UIChart } from "primeng/components/chart/chart";
+import { UIChart, SelectItem } from "primeng/primeng";
 
 
 @Component({
@@ -23,6 +23,7 @@ export class CandidatComponent implements OnInit {
   dates: any = null;
   departement: any = null;
   listes: any = null;
+  listesSenat: any = null;
 
   @ViewChild("chartmandats") chartMandats: UIChart;
   @ViewChild("chartdates") chartDates: UIChart;
@@ -33,15 +34,12 @@ export class CandidatComponent implements OnInit {
 
   MANDATS = ["Conseiller/ère départemental-e", "Maire", "Maire délégué-e", "Député-e", "Conseiller/ère métropolitain-e de Lyon", "Maire d'arrondissement", "Sénateur/trice", "Conseiller/ère régional-e", "Président-e d'un conseil de communauté de communes", "Membre du Conseil de Paris", "Représentant-e français-e au Parlement européen", "Président-e d'un conseil de métropole", "Membre de l'assemblée de Corse", "Membre élu-e de l'assemblée des Français de l'étranger"];
 
-
+  mandatsFilter: SelectItem[] = [];
 
   constructor(route: ActivatedRoute,
     private router: Router,
     private service: CandidatService
   ) {
-  
-
- 
 
     this.mandats = {
       options: {
@@ -74,7 +72,6 @@ export class CandidatComponent implements OnInit {
         }
       ]
     }
-
 
     this.dates = {
       options: {
@@ -117,6 +114,27 @@ export class CandidatComponent implements OnInit {
           backgroundColor: []
         }
       ]
+    };
+
+    this.listesSenat = {
+      options: {
+        title: {
+          display: true,
+          text: "Répartitions par groupe senatorial",
+        }
+      },
+      labels: [],
+      datasets: [
+        {
+          data: [],
+          backgroundColor: []
+        }
+      ]
+    };
+
+    this.mandatsFilter.push({ label: 'Tous les mandats', value: null });
+    for (let mandat of this.MANDATS) {
+      this.mandatsFilter.push({ label: mandat, value: mandat });
     }
 
     route.params.subscribe(p => {
@@ -124,7 +142,6 @@ export class CandidatComponent implements OnInit {
 
       this.loadCandidat();
     });
-
 
   }
 
@@ -140,7 +157,7 @@ export class CandidatComponent implements OnInit {
         let dateCount = [];
 
 
-        
+
 
         let mandatsCount = [];
         let mandatsColor = [];
@@ -160,6 +177,9 @@ export class CandidatComponent implements OnInit {
         }
 
 
+        let listesSenat = [];
+        let listesSenatCount = [];
+        let listesSenatColor = [];
 
 
         for (let parrain of candidat.Parrains) {
@@ -195,6 +215,17 @@ export class CandidatComponent implements OnInit {
             }
           }
 
+
+          if (parrain.GroupeSenat != '') {
+            if (listesSenat.indexOf(parrain.GroupeSenat) > -1) {
+              listesSenatCount[listesSenat.indexOf(parrain.GroupeSenat)]++;
+            } else {
+              listesSenat.push(parrain.GroupeSenat);
+              listesSenatCount.push(1);
+              listesSenatColor.push(this.randomColor());
+            }
+          }
+
         }
 
         let datesPogress = [];
@@ -212,7 +243,7 @@ export class CandidatComponent implements OnInit {
             }
           }
         }
-    
+
         for (let i in this.MANDATS) {
           this.mandats[i] += " (" + mandatsCount[i] + ")"
         }
@@ -225,7 +256,7 @@ export class CandidatComponent implements OnInit {
 
         this.mandats.datasets[0].data = mandatsCount;
         this.mandats.datasets[0].backgroundColor = mandatsColor;
-  
+
         this.departement.labels = departements;
         this.departement.datasets[0].data = departementCount;
         this.departement.datasets[0].backgroundColor = departementColor;
@@ -238,7 +269,11 @@ export class CandidatComponent implements OnInit {
         this.listes.labels = listes;
         this.listes.datasets[0].data = listesCount;
         this.listes.datasets[0].backgroundColor = listesColor;
-    
+
+        this.listesSenat.labels = listesSenat;
+        this.listesSenat.datasets[0].data = listesSenatCount;
+        this.listesSenat.datasets[0].backgroundColor = listesSenatColor;
+
         if (this.chartMandats != null) {
           this.chartMandats.refresh();
         }
@@ -263,8 +298,7 @@ export class CandidatComponent implements OnInit {
 
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() { }
 
   randomColor() {
     var val = Math.floor(Math.random() * 16777215).toString(16);

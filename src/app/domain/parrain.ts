@@ -7,5 +7,6 @@ export interface Parrain {
     Nom;
     Prénom;
     Liste;
+    GroupeSenat;
 }
 

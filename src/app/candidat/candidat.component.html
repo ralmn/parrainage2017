@@ -4,21 +4,27 @@
     <p id="nbParrains"> {{candidat.Parrains.length}} parrain{{parrainStr}}</p>
 
     <h2>Parrain{{parrainStr}}</h2>
-    <p-dataTable [value]="candidat.Parrains" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[5,10,20,50,100]">
+    <p-dataTable [value]="candidat.Parrains" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[5,10,20,50,100]" [globalFilter]="gb" #dt>
         <p-column field="Civilité" header="Civilité" [sortable]="true"></p-column>
         <p-column field="Nom" header="Nom" [sortable]="true"></p-column>
         <p-column field="Prénom" header="Prenom" [sortable]="true"></p-column>
-        <p-column field="Mandat" header="Mandat" [sortable]="true"></p-column>
+        <p-column field="Mandat" header="Mandat" [sortable]="true" [filter]="true" filterMatchMode="in" [style]="{'overflow':'visible'}">
+             <template pTemplate="filter" let-col>
+                <p-multiSelect [options]="mandatsFilter" defaultLabel="Tous les mandats" [style]="{'width':'100%'}" (onChange)="dt.filter($event.value,col.field,col.filterMatchMode)" styleClass="ui-column-filter"></p-multiSelect>
+            </template>
+        </p-column>
         <p-column field="Circonscription" header="Circonscription / Ville" [sortable]="true"></p-column>
         <p-column field="Département" header="Département" [sortable]="true"></p-column>
         <p-column field="Date_de_publication" header="Date publication" [sortable]="true"></p-column>
         <p-column field="Liste" header="Liste (groupe)" [sortable]="true"></p-column>
+        <p-column field="GroupeSenat" header="Groupe (Sénat)" [sortable]="true"></p-column>
     </p-dataTable>
 
     <div class="charts">
         <p-chart type="doughnut" #chartmandats [data]="mandats" [options]="mandats.options"></p-chart>
         <p-chart type="line" #chartdates [data]="dates" [options]="dates.options"></p-chart>
         <p-chart type="doughnut" #chartlistes [data]="listes" [options]="listes.options"></p-chart>
+        <p-chart type="doughnut" #chartlistes [data]="listesSenat" [options]="listesSenat.options"></p-chart>
         <p-chart type="doughnut" #chartdepartements [data]="departement" class="fullWidth" [options]="departement.options"></p-chart>
     </div>
 

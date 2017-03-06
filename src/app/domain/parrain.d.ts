@@ -7,5 +7,6 @@ export interface Parrain {
     Nom: any;
     Prénom: any;
     Liste: string;
+    GroupeSenat: string;
 }
 
