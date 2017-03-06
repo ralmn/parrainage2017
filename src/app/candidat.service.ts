@@ -12,6 +12,7 @@ import { SenateurService } from './senateur.service';
 export class CandidatService {
   
   private ville_nuance = {}; 
+  private realCandidats: Candidat[] = [];
 
   constructor( private http:Http, private senateurService:SenateurService ) {
       this.http.request('/assets/ville_nuance.json').subscribe( res => {
@@ -22,7 +23,11 @@ export class CandidatService {
    }
 
   getCandidats(cb: (error: Error | any, candidats?: Candidat[]) => any) {
-
+    
+   if(this.realCandidats.length > 0){
+      cb(null, this.realCandidats);
+     return;
+   } 
    
     this.http.request('/assets/data.json').subscribe(response =>{
       
@@ -37,7 +42,7 @@ export class CandidatService {
         for(let rawParrain of candidatRAW["Parrainages"]){
           let parrain = rawParrain as Parrain;
           parrain.Date_de_publication = rawParrain["Date de publication"];
-          this.senateurService.getGroupeSenateur(parrain);
+          
           if(parrain.Mandat == 'Maire'){
             if(this.ville_nuance[parrain.Circonscription] != null){
               parrain.Liste = this.ville_nuance[parrain.Circonscription];
@@ -48,6 +53,12 @@ export class CandidatService {
           }else{
             parrain.Liste = '';
           }
+
+          if(parrain.Mandat == "Sénateur/trice"){
+            this.senateurService.getGroupeSenateur(parrain);
+          }else{
+            parrain.GroupeSenat = "";
+          }
   
           parrains.push(parrain);
 
@@ -57,7 +68,7 @@ export class CandidatService {
           
         realCandidats.push(candidat);
       }
-
+      this.realCandidats;
       cb(null, realCandidats);
     });
      

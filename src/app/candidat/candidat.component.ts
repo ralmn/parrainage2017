@@ -29,6 +29,7 @@ export class CandidatComponent implements OnInit {
   @ViewChild("chartdates") chartDates: UIChart;
   @ViewChild("chartdepartements") chartDepartements: UIChart;
   @ViewChild("chartlistes") chartListes: UIChart;
+  @ViewChild("chartlistessenat") chartListesSenat: UIChart;
 
 
 
@@ -38,7 +39,7 @@ export class CandidatComponent implements OnInit {
 
   constructor(route: ActivatedRoute,
     private router: Router,
-    private service: CandidatService
+    public service: CandidatService
   ) {
 
     this.mandats = {
@@ -285,6 +286,9 @@ export class CandidatComponent implements OnInit {
         }
         if (this.chartListes != null) {
           this.chartListes.refresh();
+        }
+         if (this.chartListesSenat != null) {
+          this.chartListesSenat.refresh();
         }
 
         if (candidat.Parrains.length < 2) {
