@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 
 import { ActivatedRoute, Router } from '@angular/router';
 import { CandidatService } from '../candidat.service';
@@ -7,13 +7,18 @@ import { Candidat } from '../domain/candidat';
 import { ViewChild } from '@angular/core';
 import { UIChart, SelectItem } from "primeng/primeng";
 
+import { AmChartsDirective } from "amcharts3-angular2";
+
+
+declare var AmCharts: any;
+
 
 @Component({
   selector: 'app-candidat',
   templateUrl: './candidat.component.html',
   styleUrls: ['./candidat.component.css']
 })
-export class CandidatComponent implements OnInit {
+export class CandidatComponent implements OnInit, AfterViewInit {
 
   slug: String;
   parrainStr = "s";
@@ -26,12 +31,15 @@ export class CandidatComponent implements OnInit {
   listes: any = null;
   listesSenat: any = null;
 
+  mapsOptions: any = null;
+
   @ViewChild("chartmandats") chartMandats: UIChart;
   @ViewChild("chartdates") chartDates: UIChart;
   @ViewChild("chartdepartements") chartDepartements: UIChart;
   @ViewChild("chartlistes") chartListes: UIChart;
   @ViewChild("chartlistessenat") chartListesSenat: UIChart;
   @ViewChild("chartdepartementsprogression") chartDepartementsProgression: UIChart;
+  @ViewChild("mapdep") mapDepartements: AmChartsDirective;
 
 
 
@@ -162,10 +170,47 @@ export class CandidatComponent implements OnInit {
       ]
     };
 
+    this.mapsOptions = {
+      /**
+       * this tells amCharts it's a map
+       */
+      "type": "map",
+
+      /**
+       * create data provider object
+       * map property is usually the same as the name of the map file.
+       * getAreasFromMap indicates that amMap should read all the areas available
+       * in the map data and treat them as they are included in your data provider.
+       * in case you don't set it to true, all the areas except listed in data
+       * provider will be treated as unlisted.
+       */
+      "dataProvider": {
+        "map": "franceDepartmentsHigh",
+        "getAreasFromMap": true,
+        "zoomLevel": 0.9,
+        "areas": []
+      },
+      "areasSettings": {
+        "autoZoom": true,
+        "balloonText": "[[title]]: <strong>[[value]]</strong>",
+        "selectedColor": "#CC0000"
+      },
+      "listeners": [{
+        "event": "init",
+        "method": (event) => {
+          this.updateArea(event);
+        }
+      }],
+      /**
+       * let's say we want a small map to be displayed, so let's create it
+       */
+      "smallMap": {}
+    }
+
     this.mandatsFilter.push({ label: 'Tous les mandats', value: null });
     for (let mandat of this.MANDATS) {
       this.mandatsFilter.push({ label: mandat, value: mandat });
-    } 
+    }
 
     route.params.subscribe(p => {
       this.slug = p["candidat"];
@@ -173,6 +218,23 @@ export class CandidatComponent implements OnInit {
       this.loadCandidat();
     });
 
+
+
+  }
+
+  updateArea(event) {
+    //console.log("event2", event);
+    var map = event.chart;
+    if (map.dataGenerated)
+      return;
+    if (map.dataProvider.areas.length === 0) {
+      setTimeout(this.updateArea, 100);
+      return;
+    }
+    this.mapsOptions.dataProvider = map.dataProvider;
+    console.log("dataProvider", this.mapsOptions.dataProvider)
+    map.dataGenerated = true;
+    map.validateNow();
   }
 
   loadCandidat() {
@@ -195,7 +257,7 @@ export class CandidatComponent implements OnInit {
         let departements = [];
         let departementColor = [];
 
-        
+
 
 
         let listes = [];
@@ -231,7 +293,7 @@ export class CandidatComponent implements OnInit {
           let indexData = dates.indexOf(parrain.Date_de_publication);
           if (indexData > -1) {
             dateCount[indexData]++;
-            if(departementsDate[indexData].indexOf(parrain.Département) == -1){
+            if (departementsDate[indexData].indexOf(parrain.Département) == -1) {
               departementsDate[indexData].push(parrain.Département);
             }
           } else {
@@ -278,15 +340,15 @@ export class CandidatComponent implements OnInit {
 
         }
 
-        for(let i = 0; i < dates.length; i++){
+        for (let i = 0; i < dates.length; i++) {
           let date = dates[i];
           let indexSort = datesPogress.indexOf(date);
-          if(i < departementsDate.length){
-             departmentsDateProgress[indexSort] = departementsDate[i].length;
-            for(let j= 0; j <= i; j++ ){
-              if(j < departementsDate.length)
+          if (i < departementsDate.length) {
+            departmentsDateProgress[indexSort] = departementsDate[i].length;
+            for (let j = 0; j <= i; j++) {
+              if (j < departementsDate.length)
                 departmentsDateTotal[indexSort] += departementsDate[i].length;
-            } 
+            }
           }
         }
 
@@ -304,6 +366,20 @@ export class CandidatComponent implements OnInit {
         }
 
 
+        console.log("loadC", this.mapsOptions.dataProvider)
+        for (let i = 0; i < this.departement.length; i++) {
+          let name = departements[i];
+          let count = departementCount[i];
+          console.log(this.mapsOptions.dataProvider.areas.length, name, count);
+          for (let j = 0; j < this.mapsOptions.dataProvider.areas; j++) {
+            console.log(this.mapsOptions.dataProvider.areas[j].enTitle, name);
+            if (this.mapsOptions.dataProvider.areas[j].enTitle == name) {
+              this.mapsOptions.dataProvider.areas[j].value = count;
+            }
+
+          }
+
+        }
 
         for (let i in departements) {
           departements[i] += " (" + departementCount[i] + ")"
@@ -315,6 +391,9 @@ export class CandidatComponent implements OnInit {
         this.departement.labels = departements;
         this.departement.datasets[0].data = departementCount;
         this.departement.datasets[0].backgroundColor = departementColor;
+
+
+
 
 
         this.dates.label = dates;
@@ -346,7 +425,7 @@ export class CandidatComponent implements OnInit {
         if (this.chartListes != null) {
           this.chartListes.refresh();
         }
-        
+
         if (this.chartListesSenat != null) {
           this.chartListesSenat.refresh();
         }
@@ -361,12 +440,23 @@ export class CandidatComponent implements OnInit {
           this.parrainStr = "s";
         }
         this.candidat = candidat;
+
+        console.log(this.mapDepartements)
+
       }
     });
 
+
   }
 
-  ngOnInit() { }
+
+
+  ngAfterViewInit() {
+  }
+
+  ngOnInit() {
+    //this.renderMap();
+  }
 
   randomColor() {
     var val = Math.floor(Math.random() * 16777215).toString(16);

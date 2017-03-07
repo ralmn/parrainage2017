@@ -18,6 +18,8 @@ import { DataTableModule, SharedModule, MultiSelectModule } from 'primeng/primen
 import { DialogModule } from 'primeng/primeng';
 import { ChartModule } from 'primeng/primeng';
 
+import { AmChartsModule } from "amcharts3-angular2";
+
 
 import { CandidatService } from './candidat.service';
 import { SenateurService } from './senateur.service';
@@ -44,7 +46,8 @@ import { CandidatComponent } from './candidat/candidat.component';
     DialogModule,
     AppRoutingModule,
     ChartModule,
-    MultiSelectModule
+    MultiSelectModule,
+    AmChartsModule
   ],
   providers: [CandidatService, SenateurService],
   bootstrap: [AppComponent]

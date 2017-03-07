@@ -29,6 +29,10 @@
         <p-chart type="line" #chartdepartementsprogression [data]="departementsProgression" [options]="departementsProgression.options"></p-chart>
     </div>
 
+    <amCharts #mapdep [id]="mapdep" [options]="mapsOptions" [style.width.%]="100" [style.height.px]="500"></amCharts>
+
+
+
     <div class="codeNuance">
         <p>
             Correspondance nuance:
