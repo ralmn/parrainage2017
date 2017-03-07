@@ -334,22 +334,29 @@ export class CandidatComponent implements OnInit, AfterViewInit {
 
         let datesPogress = [];
         let datesPogressCount = [];
-
+  
+        let datesPogressSorted = [];
+        let datesCountSorted = [];
 
         let departmentsDateProgress = [];
         let departmentsDateTotal = [];
-
+    
         for (let date of dates.sort()) {
           datesPogress.push(date);
           datesPogressCount.push(0);
           departmentsDateProgress.push(0);
           departmentsDateTotal.push(0);
+          datesPogressSorted.push(0);
+          datesCountSorted.push(0);
+          
 
         }
 
         for (let i = 0; i < dates.length; i++) {
           let date = dates[i];
           let indexSort = datesPogress.indexOf(date);
+          datesPogressSorted[indexSort] = datesPogress[i];
+          //datesCountSorted[i] = dateCount[i];
           if (i < departementsDate.length) {
             departmentsDateProgress[indexSort] = departementsDate[i].length;
             for (let j = 0; j <= i; j++) {
@@ -360,8 +367,9 @@ export class CandidatComponent implements OnInit, AfterViewInit {
         }
 
         for (let parrain of candidat.Parrains) {
-          let indexData = dates.indexOf(parrain.Date_de_publication);
+          let indexData = datesPogress.indexOf(parrain.Date_de_publication);
           if (indexData > -1) {
+            datesCountSorted[indexData]++;
             for (let i = indexData; i < datesPogressCount.length; i++) {
               datesPogressCount[i]++;
             }
@@ -393,11 +401,8 @@ export class CandidatComponent implements OnInit, AfterViewInit {
         this.departement.datasets[0].backgroundColor = departementColor;
 
 
-
-
-
-        this.dates.labels = dates;
-        this.dates.datasets[0].data = dateCount;
+        this.dates.labels = datesPogress;
+        this.dates.datasets[0].data = datesCountSorted;
         this.dates.datasets[1].data = datesPogressCount;
 
 
