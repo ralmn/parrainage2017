@@ -22,6 +22,7 @@ export class CandidatComponent implements OnInit {
 
   dates: any = null;
   departement: any = null;
+  departementsProgression: any = null;
   listes: any = null;
   listesSenat: any = null;
 
@@ -30,6 +31,7 @@ export class CandidatComponent implements OnInit {
   @ViewChild("chartdepartements") chartDepartements: UIChart;
   @ViewChild("chartlistes") chartListes: UIChart;
   @ViewChild("chartlistessenat") chartListesSenat: UIChart;
+  @ViewChild("chartdepartementsprogression") chartDepartementsProgression: UIChart;
 
 
 
@@ -101,6 +103,33 @@ export class CandidatComponent implements OnInit {
       ]
     }
 
+    this.departementsProgression = {
+      options: {
+        title: {
+          display: true,
+          text: "Progression des département",
+        },
+      },
+      labels: [],
+      datasets: [
+        {
+          type: 'line',
+          data: [],
+          label: "Total",
+          fill: false,
+          borderColor: '#4bc0c0'
+
+        },
+        {
+          type: 'line',
+          data: [],
+          label: "Progression",
+          fill: false,
+          borderColor: '#565656'
+        }
+      ]
+    }
+
     this.listes = {
       options: {
         title: {
@@ -136,7 +165,7 @@ export class CandidatComponent implements OnInit {
     this.mandatsFilter.push({ label: 'Tous les mandats', value: null });
     for (let mandat of this.MANDATS) {
       this.mandatsFilter.push({ label: mandat, value: mandat });
-    }
+    } 
 
     route.params.subscribe(p => {
       this.slug = p["candidat"];
@@ -157,8 +186,7 @@ export class CandidatComponent implements OnInit {
         let dates = [];
         let dateCount = [];
 
-
-
+        let departementsDate = [];
 
         let mandatsCount = [];
         let mandatsColor = [];
@@ -166,6 +194,8 @@ export class CandidatComponent implements OnInit {
         let departementCount = [];
         let departements = [];
         let departementColor = [];
+
+        
 
 
         let listes = [];
@@ -201,9 +231,13 @@ export class CandidatComponent implements OnInit {
           let indexData = dates.indexOf(parrain.Date_de_publication);
           if (indexData > -1) {
             dateCount[indexData]++;
+            if(departementsDate[indexData].indexOf(parrain.Département) == -1){
+              departementsDate[indexData].push(parrain.Département);
+            }
           } else {
             dates.push(parrain.Date_de_publication);
             dateCount.push(1);
+            departementsDate.push([parrain.Département]);
           }
 
           if (parrain.Liste != '') {
@@ -231,9 +265,29 @@ export class CandidatComponent implements OnInit {
 
         let datesPogress = [];
         let datesPogressCount = [];
+
+
+        let departmentsDateProgress = [];
+        let departmentsDateTotal = [];
+
         for (let date of dates.sort()) {
           datesPogress.push(date);
           datesPogressCount.push(0);
+          departmentsDateProgress.push(0);
+          departmentsDateTotal.push(0);
+
+        }
+
+        for(let i = 0; i < dates.length; i++){
+          let date = dates[i];
+          let indexSort = datesPogress.indexOf(date);
+          if(i < departementsDate.length){
+             departmentsDateProgress[indexSort] = departementsDate[i].length;
+            for(let j= 0; j <= i; j++ ){
+              if(j < departementsDate.length)
+                departmentsDateTotal[indexSort] += departementsDate[i].length;
+            } 
+          }
         }
 
         for (let parrain of candidat.Parrains) {
@@ -267,6 +321,11 @@ export class CandidatComponent implements OnInit {
         this.dates.datasets[0].data = dateCount;
         this.dates.datasets[1].data = datesPogressCount;
 
+
+        this.departementsProgression.label = datesPogress;
+        this.departementsProgression.datasets[0].data = departmentsDateTotal;
+        this.departementsProgression.datasets[1].data = departmentsDateProgress;
+
         this.listes.labels = listes;
         this.listes.datasets[0].data = listesCount;
         this.listes.datasets[0].backgroundColor = listesColor;
@@ -287,8 +346,13 @@ export class CandidatComponent implements OnInit {
         if (this.chartListes != null) {
           this.chartListes.refresh();
         }
-         if (this.chartListesSenat != null) {
+        
+        if (this.chartListesSenat != null) {
           this.chartListesSenat.refresh();
+        }
+
+        if (this.chartDepartementsProgression != null) {
+          this.chartDepartementsProgression.refresh();
         }
 
         if (candidat.Parrains.length < 2) {
