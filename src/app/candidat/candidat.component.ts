@@ -396,12 +396,12 @@ export class CandidatComponent implements OnInit, AfterViewInit {
 
 
 
-        this.dates.label = dates;
+        this.dates.labels = dates;
         this.dates.datasets[0].data = dateCount;
         this.dates.datasets[1].data = datesPogressCount;
 
 
-        this.departementsProgression.label = datesPogress;
+        this.departementsProgression.labels = datesPogress;
         this.departementsProgression.datasets[0].data = departmentsDateTotal;
         this.departementsProgression.datasets[1].data = departmentsDateProgress;
 
