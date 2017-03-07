@@ -32,6 +32,7 @@ export class CandidatComponent implements OnInit, AfterViewInit {
   listesSenat: any = null;
 
   mapsOptions: any = null;
+  indexArea = {};
 
   @ViewChild("chartmandats") chartMandats: UIChart;
   @ViewChild("chartdates") chartDates: UIChart;
@@ -39,7 +40,7 @@ export class CandidatComponent implements OnInit, AfterViewInit {
   @ViewChild("chartlistes") chartListes: UIChart;
   @ViewChild("chartlistessenat") chartListesSenat: UIChart;
   @ViewChild("chartdepartementsprogression") chartDepartementsProgression: UIChart;
-  @ViewChild("mapdep") mapDepartements: AmChartsDirective;
+  mapDepartements: any;
 
 
 
@@ -47,10 +48,49 @@ export class CandidatComponent implements OnInit, AfterViewInit {
 
   mandatsFilter: SelectItem[] = [];
 
-  constructor(route: ActivatedRoute,
+  constructor(private route: ActivatedRoute,
     private router: Router,
     public service: CandidatService
   ) {
+    this.mapsOptions = {
+      /**
+       * this tells amCharts it's a map
+       */
+      "type": "map",
+      "colorSteps": 10,
+      "theme": "light",
+      /**
+       * create data provider object
+       * map property is usually the same as the name of the map file.
+       * getAreasFromMap indicates that amMap should read all the areas available
+       * in the map data and treat them as they are included in your data provider.
+       * in case you don't set it to true, all the areas except listed in data
+       * provider will be treated as unlisted.
+       */
+      "dataProvider": {
+        "map": "franceDepartmentsHigh",
+        "getAreasFromMap": true,
+        "zoomLevel": 0.9,
+        "areas": []
+      },
+      "areasSettings": {
+        "autoZoom": false,
+        "balloonText": "[[title]]: <strong>[[value]]</strong>"
+        //"selectedColor": "#CC0000"
+      },
+      "valueLegend": {
+        "right": 1,
+        "minValue": "little",
+        "maxValue": "a lot!"
+      },
+      "listeners": [{
+        "event": "init",
+        "method": (event) => {
+          this.updateArea(event);
+        }
+      }],
+
+    }
 
     this.mandats = {
       options: {
@@ -170,71 +210,38 @@ export class CandidatComponent implements OnInit, AfterViewInit {
       ]
     };
 
-    this.mapsOptions = {
-      /**
-       * this tells amCharts it's a map
-       */
-      "type": "map",
 
-      /**
-       * create data provider object
-       * map property is usually the same as the name of the map file.
-       * getAreasFromMap indicates that amMap should read all the areas available
-       * in the map data and treat them as they are included in your data provider.
-       * in case you don't set it to true, all the areas except listed in data
-       * provider will be treated as unlisted.
-       */
-      "dataProvider": {
-        "map": "franceDepartmentsHigh",
-        "getAreasFromMap": true,
-        "zoomLevel": 0.9,
-        "areas": []
-      },
-      "areasSettings": {
-        "autoZoom": true,
-        "balloonText": "[[title]]: <strong>[[value]]</strong>",
-        "selectedColor": "#CC0000"
-      },
-      "listeners": [{
-        "event": "init",
-        "method": (event) => {
-          this.updateArea(event);
-        }
-      }],
-      /**
-       * let's say we want a small map to be displayed, so let's create it
-       */
-      "smallMap": {}
-    }
 
     this.mandatsFilter.push({ label: 'Tous les mandats', value: null });
     for (let mandat of this.MANDATS) {
       this.mandatsFilter.push({ label: mandat, value: mandat });
     }
 
-    route.params.subscribe(p => {
-      this.slug = p["candidat"];
-
-      this.loadCandidat();
-    });
-
-
 
   }
 
   updateArea(event) {
-    //console.log("event2", event);
     var map = event.chart;
+    this.mapDepartements = map;
     if (map.dataGenerated)
       return;
     if (map.dataProvider.areas.length === 0) {
       setTimeout(this.updateArea, 100);
       return;
     }
-    this.mapsOptions.dataProvider = map.dataProvider;
+    this.mapsOptions.dataProvider.areas = map.dataProvider.areas;
+    for (let i = 0; i < map.dataProvider.areas.length; i++) {
+      let area = map.dataProvider.areas[i];
+      area.value = 0;
+      this.indexArea[area.enTitle] = i;
+
+    }
     console.log("dataProvider", this.mapsOptions.dataProvider)
-    map.dataGenerated = true;
-    map.validateNow();
+    if (this.slug != null) {
+      this.loadCandidat();
+
+    }
+
   }
 
   loadCandidat() {
@@ -365,20 +372,13 @@ export class CandidatComponent implements OnInit, AfterViewInit {
           this.mandats[i] += " (" + mandatsCount[i] + ")"
         }
 
-
-        console.log("loadC", this.mapsOptions.dataProvider)
-        for (let i = 0; i < this.departement.length; i++) {
+        for (let i = 0; i < departements.length; i++) {
           let name = departements[i];
           let count = departementCount[i];
-          console.log(this.mapsOptions.dataProvider.areas.length, name, count);
-          for (let j = 0; j < this.mapsOptions.dataProvider.areas; j++) {
-            console.log(this.mapsOptions.dataProvider.areas[j].enTitle, name);
-            if (this.mapsOptions.dataProvider.areas[j].enTitle == name) {
-              this.mapsOptions.dataProvider.areas[j].value = count;
-            }
-
+          let indexDep = this.indexArea[name];
+          if (indexDep != null && this.mapsOptions.dataProvider.areas[indexDep].enTitle == name) {
+            this.mapsOptions.dataProvider.areas[indexDep].value = count;
           }
-
         }
 
         for (let i in departements) {
@@ -441,7 +441,11 @@ export class CandidatComponent implements OnInit, AfterViewInit {
         }
         this.candidat = candidat;
 
-        console.log(this.mapDepartements)
+        
+        if (this.mapDepartements != null) {
+          this.mapDepartements.validateData(); //2fois car yolo
+          this.mapDepartements.validateData();
+        }
 
       }
     });
@@ -452,10 +456,16 @@ export class CandidatComponent implements OnInit, AfterViewInit {
 
 
   ngAfterViewInit() {
+    this.route.params.subscribe(p => {
+      this.slug = p["candidat"];
+      this.loadCandidat();
+
+    });
   }
 
   ngOnInit() {
     //this.renderMap();
+
   }
 
   randomColor() {
