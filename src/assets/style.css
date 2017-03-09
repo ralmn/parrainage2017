@@ -82,3 +82,13 @@
     margin-left: 30px;
     list-style: none;
 }
+
+
+.checked{
+    background-color: #02d202;
+    color: white;
+    border-radius: 5px;
+    border: 1px solid white;
+    padding: 0px 5px;
+    margin: 5px;
+}

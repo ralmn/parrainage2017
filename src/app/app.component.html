@@ -8,6 +8,7 @@
         
         <a class="menu_input" *ngFor="let candidat of list" [routerLink]="['/candidat',candidat.slug ]">
             {{candidat.nom}}
+            <span class="checked" *ngIf="candidat.valid">✓</span>
         </a>
         
     </div>

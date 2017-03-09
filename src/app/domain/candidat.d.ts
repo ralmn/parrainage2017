@@ -8,5 +8,6 @@ export class Candidat {
     public constructor(Nom: string, Parrain: Parrain[])
 
     slug(): string;
+    peutEtreCandidat() : boolean;
 
 }

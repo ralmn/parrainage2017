@@ -81,7 +81,7 @@ export class CandidatService {
       }else{
         let list: any[] = [];
         for(let candidat of candidats){
-          list.push({slug: candidat.slug(), nom: candidat.Nom});
+          list.push({slug: candidat.slug(), nom: candidat.Nom, valid: candidat.peutEtreCandidat()});
         }
         cb(null, list);
       }
