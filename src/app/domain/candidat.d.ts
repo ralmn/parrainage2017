@@ -9,5 +9,6 @@ export class Candidat {
 
     slug(): string;
     peutEtreCandidat() : boolean;
+    estEgocentrique(): boolean;
 
 }

@@ -2,7 +2,7 @@
 <div *ngIf="candidat != null">
     <h1>{{candidat.Nom}} <span class="checked" *ngIf="candidat.peutEtreCandidat()">✓</span></h1>
     <p id="nbParrains"> {{candidat.Parrains.length}} parrain{{parrainStr}}</p>
-    
+    <p *ngIf="candidat.estEgocentrique()">Se parraine lui même</p>
     <h2>Parrain{{parrainStr}}</h2>
     <p-dataTable [value]="candidat.Parrains" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[5,10,20,50,100]" [globalFilter]="gb" #dt>
         <p-column field="Civilité" header="Civilité" [sortable]="true"></p-column>

@@ -22,6 +22,15 @@ export class Candidat {
         }
         return date;
     }
+        
+    estEgocentrique() : boolean {
+        for(let parrain of this.Parrains){
+            if( `${parrain.Nom} ${parrain.Prénom}` == this.Nom ){
+                return true;
+            }
+        }
+        return false;
+    }
 
     peutEtreCandidat() : boolean {
         if(this.Parrains.length < 500) return false;
